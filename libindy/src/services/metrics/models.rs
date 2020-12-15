@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 const BUCKET_COUNT: usize = 16;
-const LIST_LE: [&str; BUCKET_COUNT] = ["0.5", "1", "2", "5", "10", "20", "50", "100", "200", "500", "1000", "2000", "5000", "10000", "20000", "+Inf"];
+const LIST_LE: [f64; BUCKET_COUNT-1] = [0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0, 20000.0];
 
 #[derive(Serialize, Deserialize)]
 pub struct MetricsValue {
@@ -35,23 +35,12 @@ impl CommandCounters {
     }
 
     fn add_buckets(&mut self, duration: u128) {
-        for (mut le_index, le_value) in LIST_LE.iter().enumerate() {
-            let mut index: f64 = 0.0;
-
-            match le_value.parse::<f64>() {
-                Ok(le_value) => {
-                    index = le_value;
-                },
-                Err(err) => {
-                    index = duration as f64;
-                    le_index = LIST_LE.len()-1;
-                }
-            }
-            if duration <= index as u128 {
+        for (le_index, le_value) in LIST_LE.iter().enumerate() {
+            if duration <= *le_value as u128 {
                 self.duration_ms_bucket[le_index] += 1;
             }
+            self.duration_ms_bucket[self.duration_ms_bucket.len()-1] += 1;
         }
-
     }
 
 }

@@ -50,10 +50,6 @@ impl MetricsService {
         tags
     }
 
-    fn append_command_metrics_bucket(&self, index_command: usize, index_bucket: usize) -> u128 {
-        self.executed_counters.borrow()[index_command].duration_ms_bucket[index_bucket]
-    }
-
     pub fn append_command_metrics(&self, metrics_map: &mut Map<String, Value>) -> IndyResult<()> {
         let mut commands_count = Vec::new();
         let mut commands_duration_ms = Vec::new();
@@ -164,10 +160,10 @@ mod test {
     fn test_counters_are_initialized_as_zeros() {
         let metrics_service = MetricsService::new();
         for index in (0..MetricsService::commands_count()).rev() {
-            assert_eq!(metrics_service.queued_counters.borrow()[index as usize].count, 0 /*queued_commands_count.borrow()[index as usize], 0*/);
-            assert_eq!(metrics_service.queued_counters.borrow()[index as usize].duration_ms_sum, 0 /*queued_commands_duration_ms.borrow()[index as usize], 0*/);
-            assert_eq!(metrics_service.executed_counters.borrow()[index as usize].count, 0 /*executed_commands_count.borrow()[index as usize], 0*/);
-            assert_eq!(metrics_service.executed_counters.borrow()[index as usize].duration_ms_sum, 0 /*executed_commands_duration_ms.borrow()[index as usize], 0*/);
+            assert_eq!(metrics_service.queued_counters.borrow()[index as usize].count, 0);
+            assert_eq!(metrics_service.queued_counters.borrow()[index as usize].duration_ms_sum, 0);
+            assert_eq!(metrics_service.executed_counters.borrow()[index as usize].count, 0);
+            assert_eq!(metrics_service.executed_counters.borrow()[index as usize].duration_ms_sum, 0);
         }
     }
 
