@@ -14,6 +14,8 @@ mod collect {
     use super::*;
     use std::collections::HashMap;
     use serde_json::Value;
+    use api::anoncreds;
+    use indy_sys::WalletHandle;
 
     #[test]
     fn collect_metrics_contains_thread_pool_and_wallet_service_statistics() {
@@ -123,4 +125,13 @@ mod collect {
     fn config(name: &str) -> String {
         json!({"id": name}).to_string()
     }
+
+    #[test]
+    fn collect_metrics_callback() {
+        let setup = Setup::empty();
+        let config = config(&setup.name);
+        wallet::create_wallet(&config, WALLET_CREDENTIALS).unwrap();
+        anoncreds::issuer_rotate_credential_def_start(WalletHandle { 0: 0 }, "qwerty", Some(config.as_str()));
+    }
+
 }
