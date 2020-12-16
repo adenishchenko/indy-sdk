@@ -17,6 +17,7 @@ use futures::Future;
 mod collect {
     use super::*;
     use std::collections::HashMap;
+    use serde_json::Value;
 
     #[test]
     fn collect_metrics() {
