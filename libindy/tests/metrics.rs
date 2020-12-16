@@ -55,7 +55,6 @@ mod collect {
         for command in &expected_wallet_count {
             assert!(wallet_count.contains(&command));
         }
-
     }
 
     #[test]
@@ -69,18 +68,13 @@ mod collect {
 
         assert!(metrics_map.contains_key("commands_count"));
         assert!(metrics_map.contains_key("commands_duration_ms"));
+        assert!(metrics_map.contains_key("commands_duration_ms_bucket"));
 
         let commands_count = metrics_map
             .get("commands_count")
             .unwrap()
             .as_array()
             .unwrap();
-        let commands_duration_ms = metrics_map
-            .get("commands_duration_ms")
-            .unwrap()
-            .as_array()
-            .unwrap();
-
         let commands_duration_ms_bucket = metrics_map
             .get("commands_duration_ms_bucket")
             .unwrap()
@@ -88,32 +82,17 @@ mod collect {
             .unwrap();
 
         let expected_commands_count = [
-            json!({"tags":{"command":"payments_command_build_set_txn_fees_req_ack","stage":"executed"},"value":0}),
-            json!({"tags":{"command":"pairwise_command_pairwise_exists","stage":"queued"},"value":0}),
-            json!({"tags":{"command":"cache_command_purge_cred_def_cache","stage":"executed"},"value":0}),
-            json!({"tags":{"command":"non_secrets_command_fetch_search_next_records","stage":"queued"},"value":0}),
-        ];
-
-        let expected_commands_duration_ms = [
-            json!({"tags":{"command":"payments_command_build_set_txn_fees_req_ack","stage":"executed"},"value":0}),
-            json!({"tags":{"command":"pairwise_command_pairwise_exists","stage":"queued"},"value":0}),
-            json!({"tags":{"command":"cache_command_purge_cred_def_cache","stage":"executed"},"value":0}),
-            json!({"tags":{"command":"non_secrets_command_fetch_search_next_records","stage":"queued"},"value":0}),
+            json!({"tags":{"command":"wallet_command_create","stage":"executed"},"value":1}),
+            json!({"tags":{"command":"wallet_command_create","stage":"queued"},"value":1}),
         ];
 
         let expected_commands_duration_ms_bucket = [
-            json!({"tags":{"command":"payments_command_build_set_txn_fees_req_ack","stage":"executed"},"value":0}),
-            json!({"tags":{"command":"pairwise_command_pairwise_exists","stage":"queued"},"value":0}),
-            json!({"tags":{"command":"cache_command_purge_cred_def_cache","stage":"executed"},"value":0}),
-            json!({"tags":{"command":"non_secrets_command_fetch_search_next_records","stage":"queued"},"value":0}),
+            json!({"tags":{"command":"wallet_command_create","stage":"executed"},"value":1}),
+            json!({"tags":{"command":"wallet_command_create","stage":"queued"},"value":1}),
         ];
 
         for command in &expected_commands_count {
             assert!(commands_count.contains(&command));
-        }
-
-        for command in &expected_commands_duration_ms {
-            assert!(commands_duration_ms.contains(&command));
         }
 
         for command in &expected_commands_duration_ms_bucket {

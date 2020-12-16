@@ -39,8 +39,8 @@ impl CommandCounters {
             if duration <= *le_value as u128 {
                 self.duration_ms_bucket[le_index] += 1;
             }
-            self.duration_ms_bucket[self.duration_ms_bucket.len()-1] += 1;
         }
+        self.duration_ms_bucket[self.duration_ms_bucket.len()-1] += 1;
     }
 
 }

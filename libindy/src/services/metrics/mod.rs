@@ -178,14 +178,36 @@ mod test {
 
         assert_eq!(metrics_service.queued_counters.borrow()[index as usize].count, 1);
         assert_eq!(metrics_service.queued_counters.borrow()[index as usize].duration_ms_sum, duration1);
+        assert_eq!(metrics_service.queued_counters.borrow()[index as usize]
+            .duration_ms_bucket[
+                metrics_service.queued_counters.borrow()[index as usize]
+                .duration_ms_bucket.len()-1
+            ],
+            1
+        );
 
         metrics_service.cmd_left_queue(index, duration2);
 
         assert_eq!(metrics_service.queued_counters.borrow()[index as usize].count, 1 + 1);
         assert_eq!(metrics_service.queued_counters.borrow()[index as usize].duration_ms_sum,
                    duration1 + duration2);
+        assert_eq!(metrics_service.queued_counters.borrow()[index as usize]
+           .duration_ms_bucket[
+           metrics_service.queued_counters.borrow()[index as usize]
+               .duration_ms_bucket.len()-1
+           ],
+           2
+        );
+
         assert_eq!(metrics_service.executed_counters.borrow()[index as usize].count, 0);
         assert_eq!(metrics_service.executed_counters.borrow()[index as usize].duration_ms_sum, 0);
+        assert_eq!(metrics_service.executed_counters.borrow()[index as usize]
+           .duration_ms_bucket[
+           metrics_service.executed_counters.borrow()[index as usize]
+               .duration_ms_bucket.len()-1
+           ],
+           0
+        );
     }
 
     #[test]
@@ -217,6 +239,8 @@ mod test {
 
         assert!(metrics_map.contains_key("commands_count"));
         assert!(metrics_map.contains_key("commands_duration_ms"));
+        assert!(metrics_map.contains_key("commands_duration_ms_bucket"));
+
         assert_eq!(
             metrics_map
                 .get("commands_count")
@@ -234,6 +258,15 @@ mod test {
                 .unwrap()
                 .len(),
             COMMANDS_COUNT * 2
+        );
+        assert_eq!(
+            metrics_map
+                .get("commands_duration_ms_bucket")
+                .unwrap()
+                .as_array()
+                .unwrap()
+                .len(),
+            COMMANDS_COUNT * 64
         );
 
         let commands_count = metrics_map
