@@ -16,6 +16,8 @@ use crate::domain::ledger::auth_rule::{AuthRules, Constraint};
 use crate::domain::ledger::author_agreement::{AcceptanceMechanisms, GetTxnAuthorAgreementData};
 use crate::domain::ledger::node::NodeOperationData;
 use crate::domain::ledger::pool::Schedule;
+use crate::services::metrics::MetricsService;
+use std::rc::Rc;
 
 /// Signs and submits request message to validator pool.
 ///
@@ -732,7 +734,7 @@ pub extern fn indy_parse_get_schema_response(command_handle: CommandHandle,
     let result = CommandExecutor::instance()
         .send(Command::Ledger(LedgerCommand::ParseGetSchemaResponse(
             get_schema_response,
-            Box::new(move |result| {
+            Box::new(move |result, metrics_service: Rc<MetricsService>| {
                 let (err, schema_id, schema_json) = prepare_result_2!(result, String::new(), String::new());
                 trace!("indy_parse_get_schema_response: schema_id: {:?}, schema_json: {:?}", schema_id, schema_json);
                 let schema_id = ctypes::string_to_cstring(schema_id);
@@ -886,7 +888,7 @@ pub extern fn indy_parse_get_cred_def_response(command_handle: CommandHandle,
     let result = CommandExecutor::instance()
         .send(Command::Ledger(LedgerCommand::ParseGetCredDefResponse(
             get_cred_def_response,
-            Box::new(move |result| {
+            Box::new(move |result, metrics_service: Rc<MetricsService>| {
                 let (err, cred_def_id, cred_def_json) = prepare_result_2!(result, String::new(), String::new());
                 trace!("indy_parse_get_cred_def_response: cred_def_id: {:?}, cred_def_json: {:?}", cred_def_id, cred_def_json);
                 let cred_def_id = ctypes::string_to_cstring(cred_def_id);
@@ -1374,7 +1376,7 @@ pub extern fn indy_parse_get_revoc_reg_def_response(command_handle: CommandHandl
     let result = CommandExecutor::instance()
         .send(Command::Ledger(LedgerCommand::ParseGetRevocRegDefResponse(
             get_revoc_reg_def_response,
-            Box::new(move |result| {
+            Box::new(move |result, metrics_service: Rc<MetricsService>| {
                 let (err, revoc_reg_def_id, revoc_reg_def_json) = prepare_result_2!(result, String::new(), String::new());
                 trace!("indy_parse_get_revoc_reg_def_response: revoc_reg_def_id: {:?}, revoc_reg_def_json: {:?}", revoc_reg_def_id, revoc_reg_def_json);
 
@@ -1537,7 +1539,7 @@ pub extern fn indy_parse_get_revoc_reg_response(command_handle: CommandHandle,
     let result = CommandExecutor::instance()
         .send(Command::Ledger(LedgerCommand::ParseGetRevocRegResponse(
             get_revoc_reg_response,
-            Box::new(move |result| {
+            Box::new(move |result, metrics_service: Rc<MetricsService>| {
                 let (err, revoc_reg_def_id, revoc_reg_json, timestamp) = prepare_result_3!(result, String::new(), String::new(), 0);
                 trace!("indy_parse_get_revoc_reg_response: revoc_reg_def_id: {:?}, revoc_reg_json: {:?}, timestamp: {:?}",
                        revoc_reg_def_id, revoc_reg_json, timestamp);
@@ -1648,7 +1650,7 @@ pub extern fn indy_parse_get_revoc_reg_delta_response(command_handle: CommandHan
     let result = CommandExecutor::instance()
         .send(Command::Ledger(LedgerCommand::ParseGetRevocRegDeltaResponse(
             get_revoc_reg_delta_response,
-            Box::new(move |result| {
+            Box::new(move |result, metrics_service: Rc<MetricsService>| {
                 let (err, revoc_reg_def_id, revoc_reg_delta_json, timestamp) = prepare_result_3!(result, String::new(), String::new(), 0);
                 trace!("indy_parse_get_revoc_reg_delta_response: revoc_reg_def_id: {:?}, revoc_reg_delta_json: {:?}, timestamp: {:?}",
                        revoc_reg_def_id, revoc_reg_delta_json, timestamp);
@@ -1718,7 +1720,7 @@ pub extern fn indy_register_transaction_parser_for_sp(command_handle: CommandHan
             txn_type,
             parser,
             free,
-            Box::new(move |res| {
+            Box::new(move |res, metrics_service: Rc<MetricsService>| {
                 let res = prepare_result!(res);
                 trace!("indy_register_transaction_parser_for_sp: res: {:?}", res);
                 cb(command_handle, res)
